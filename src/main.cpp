@@ -1,4 +1,8 @@
 #include <iostream>
+#include<thread>
+#include<mutex>
+
+//local includes
 #include<colour.hpp>
 #include<ray.hpp>
 #include<sphere.hpp>
@@ -95,16 +99,26 @@ int main() {
     std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
     int i=0;
     int j=0;
+    std::mutex mut;
     for (int j = image_height-1; j >= 0; --j) {
         for (int i = 0; i < image_width; ++i) {
         std::cerr<<"\rScan lines remaining "<<' '<<j<<std::flush;
+            std::vector<std::thread> threads;                                
             raytracer::Colour pixel_color = raytracer::Colour(); 
+            const auto lambda = [&mut, &camera, i, j, &world, &pixel_color, &image_height, &image_width]() {
+                    auto u = (i + raytracer::random()) / (image_width-1);
+                    auto v = (j + raytracer::random()) / (image_height-1);
+                    raytracer::Ray ray= camera.get_ray(u,v);
+                    raytracer::Colour out_colour = ray_colour(ray,world,50);
+                    mut.lock();
+                    pixel_color = pixel_color + out_colour;
+                    mut.unlock();
+            };
             for(int k=0; k<samples_per_pixel; k++){
-                auto u = (i + raytracer::random()) / (image_width-1);
-                auto v = (j + raytracer::random()) / (image_height-1);
-                raytracer::Ray ray= camera.get_ray(u,v);
-                pixel_color = pixel_color + ray_colour(ray, world, 50);
-                
+                threads.push_back(std::thread(lambda));
+            }
+            for(int k=0;k<threads.size();k++){
+                threads.at(k).join();
             }
             raytracer::write_colour(pixel_color, samples_per_pixel, 2.0);
         }
