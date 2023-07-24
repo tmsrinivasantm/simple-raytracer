@@ -110,9 +110,7 @@ int main() {
                     auto v = (j + raytracer::random()) / (image_height-1);
                     raytracer::Ray ray= camera.get_ray(u,v);
                     raytracer::Colour out_colour = ray_colour(ray,world,50);
-                    mut.lock();
                     pixel_color = pixel_color + out_colour;
-                    mut.unlock();
             };
             for(int k=0; k<samples_per_pixel; k++){
                 threads.push_back(std::thread(lambda));
