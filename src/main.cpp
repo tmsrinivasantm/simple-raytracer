@@ -105,7 +105,7 @@ int main() {
         std::cerr<<"\rScan lines remaining "<<' '<<j<<std::flush;
             std::vector<std::thread> threads;                                
             raytracer::Colour pixel_color = raytracer::Colour(); 
-            const auto lambda = [&mut, &camera, i, j, &world, &pixel_color, &image_height, &image_width]() {
+            const auto lambda = [&]() {
                     auto u = (i + raytracer::random()) / (image_width-1);
                     auto v = (j + raytracer::random()) / (image_height-1);
                     raytracer::Ray ray= camera.get_ray(u,v);
