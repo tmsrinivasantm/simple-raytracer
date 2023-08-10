@@ -19,8 +19,3 @@ target_link_libraries(raytracer utilities)
 #materials
 add_subdirectory(libs/materials)
 target_link_libraries(raytracer materials)
-
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-    target_link_libraries(raytracer OpenMP::OpenMP_CXX)
-endif()
